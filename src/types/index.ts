@@ -31,3 +31,6 @@ export interface AgentConfig {
   pineconeEnvironment: string;
   pineconeIndexName: string;
 }
+
+// Constants
+export const EMBEDDING_DIMENSION = 1536; // Amazon Titan embedding dimension

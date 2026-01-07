@@ -12,6 +12,11 @@ export function chunkText(
   chunkSize: number = 1000,
   overlap: number = 200
 ): string[] {
+  // Validate inputs to prevent infinite loops
+  if (overlap >= chunkSize) {
+    throw new Error('Overlap must be less than chunk size');
+  }
+
   const chunks: string[] = [];
   let startIndex = 0;
 
@@ -22,11 +27,6 @@ export function chunkText(
 
     // Move the start index forward, accounting for overlap
     startIndex += chunkSize - overlap;
-
-    // Prevent infinite loop if overlap is too large
-    if (startIndex <= chunks.length * overlap && startIndex < text.length) {
-      startIndex = chunks.length * (chunkSize - overlap);
-    }
   }
 
   return chunks;

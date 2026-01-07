@@ -1,5 +1,5 @@
 import { Pinecone } from '@pinecone-database/pinecone';
-import { TextChunk } from '../types/index.js';
+import { TextChunk, EMBEDDING_DIMENSION } from '../types/index.js';
 import { EmbeddingService } from './embeddingService.js';
 
 /**
@@ -34,7 +34,7 @@ export class VectorDBService {
         console.log(`Creating index: ${this.indexName}`);
         await this.pinecone.createIndex({
           name: this.indexName,
-          dimension: 1536, // Dimension for Amazon Titan embeddings
+          dimension: EMBEDDING_DIMENSION,
           metric: 'cosine',
           spec: {
             serverless: {
@@ -115,16 +115,33 @@ export class VectorDBService {
       });
 
       // Convert results to TextChunk format
-      const chunks: TextChunk[] = queryResponse.matches.map((match) => ({
-        id: match.id,
-        text: match.metadata?.text as string,
-        embedding: match.values,
-        metadata: {
-          documentId: match.metadata?.documentId as string,
-          filename: match.metadata?.filename as string,
-          chunkIndex: match.metadata?.chunkIndex as number,
-        },
-      }));
+      const chunks: TextChunk[] = queryResponse.matches.map((match) => {
+        // Validate metadata exists and has required fields
+        if (!match.metadata) {
+          throw new Error(`Missing metadata for match ${match.id}`);
+        }
+
+        const text = match.metadata.text;
+        const documentId = match.metadata.documentId;
+        const filename = match.metadata.filename;
+        const chunkIndex = match.metadata.chunkIndex;
+
+        if (typeof text !== 'string' || typeof documentId !== 'string' || 
+            typeof filename !== 'string' || typeof chunkIndex !== 'number') {
+          throw new Error(`Invalid metadata types for match ${match.id}`);
+        }
+
+        return {
+          id: match.id,
+          text,
+          embedding: match.values,
+          metadata: {
+            documentId,
+            filename,
+            chunkIndex,
+          },
+        };
+      });
 
       return chunks;
     } catch (error) {
@@ -144,7 +161,7 @@ export class VectorDBService {
 
       // Query all chunks for this document
       const allChunks = await index.query({
-        vector: new Array(1536).fill(0), // Dummy vector
+        vector: new Array(EMBEDDING_DIMENSION).fill(0), // Dummy vector
         topK: 10000,
         includeMetadata: true,
         filter: {

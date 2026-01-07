@@ -48,11 +48,16 @@ export class EmbeddingService {
    * @returns Array of embedding arrays
    */
   async generateEmbeddings(texts: string[]): Promise<number[][]> {
+    // Process in batches with concurrency control to respect rate limits
+    const maxConcurrent = 5;
     const embeddings: number[][] = [];
 
-    for (const text of texts) {
-      const embedding = await this.generateEmbedding(text);
-      embeddings.push(embedding);
+    for (let i = 0; i < texts.length; i += maxConcurrent) {
+      const batch = texts.slice(i, i + maxConcurrent);
+      const batchEmbeddings = await Promise.all(
+        batch.map((text) => this.generateEmbedding(text))
+      );
+      embeddings.push(...batchEmbeddings);
     }
 
     return embeddings;
