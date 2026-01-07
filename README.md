@@ -1,6 +1,17 @@
 # PDF AI Agent with AWS Bedrock and Vector Database
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue.svg)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
+
 An intelligent AI agent built with AWS Bedrock that processes PDF documents, stores content in a vector database (Pinecone), and allows users to query information using natural language.
+
+## 📚 Quick Links
+
+- [Quick Start Guide](QUICKSTART.md) - Get started in 5 minutes
+- [Examples](EXAMPLES.md) - Usage examples and tutorials
+- [Architecture](ARCHITECTURE.md) - System design and components
+- [Contributing](CONTRIBUTING.md) - How to contribute
 
 ## Features
 
